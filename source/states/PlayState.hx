@@ -232,7 +232,7 @@ class PlayState extends ZState
 
 	function make_game_over_text()
 	{
-		var t = ['BAD DRIVER +1', 'GAME OVER', 'YOU BLEW IT', 'YOU STINK', 'NICE JOB', 'GO FRICK URSELF', 'WOW', 'LITERALLY THE WORST', 'GO AWAY', 'GIVE UP VIDEO GAMES'].get_random();
+		var t = ['RISKY DRIVER', 'CLAIM REJECTED', 'POLICY CANCELLED', 'HIGH PREMIUM', 'ACCIDENT!', 'NO INSURANCE', 'RATE HIKE', 'DEDUCTIBLE LOST', 'COVERAGE DENIED', 'CALL AGENT'].get_random();
 		var c = [0xfffc301d, 0xffff7e2b, 0xffffc702, 0x760046, 0xff59ff9b, 0xff00a093, 0xff4ba8ff, 0xffb1d61b, 0xff13b517].get_random();
 		var text = new ZBitmapText(0.get_random(0, FlxG.width - 64), FlxG.height.get_random(0), Assets.getText(AssetsData.letters__txt), FlxPoint.get(7, 9), AssetsImg.font__png, FlxTextAlign.CENTER, 64, -2, -1);
 		text.text = t;
