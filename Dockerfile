@@ -1,8 +1,9 @@
 # Use an image with Haxe and Lime pre-installed
-FROM haxe:4.3-alpine AS builder
+# Using standard haxe image (Debian based) instead of alpine to ensure glibc compatibility for lime binaries
+FROM haxe:4.3 AS builder
 
 # Install git (required for haxelib git)
-RUN apk add --no-cache git
+RUN apt-get update && apt-get install -y git
 
 # Install dependencies
 RUN haxelib install flixel
