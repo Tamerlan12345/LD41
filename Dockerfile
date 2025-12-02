@@ -1,6 +1,9 @@
 # Use an image with Haxe and Lime pre-installed
 FROM haxe:4.3-alpine AS builder
 
+# Install git (required for haxelib git)
+RUN apk add --no-cache git
+
 # Install dependencies
 RUN haxelib install flixel
 RUN haxelib install lime
