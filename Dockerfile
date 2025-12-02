@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y git
 RUN haxelib install flixel
 RUN haxelib install lime
 RUN haxelib install openfl
-RUN haxelib git zerolib https://github.com/01010111/zerolib.git
+RUN haxelib git zerolib https://github.com/01010111/zerolib.git 0.4.0
 
 # Set working directory
 WORKDIR /app
