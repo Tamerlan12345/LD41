@@ -1,4 +1,5 @@
 package objects;
+import flixel.tweens.FlxTween.FlxTweenType;
 
 import objects.ThreeDeeObject.Slice;
 
@@ -9,7 +10,7 @@ class Selection extends ThreeDeeObject
 	{
 		super(FlxPoint.get(), AssetsImg.selection__png, 4, false, false, false, 24);
 		offset = 1;
-		FlxTween.tween(this, { offset: 4 }, 1.2, { ease:FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(this, { offset: 4 }, 1.2, { ease:FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 	}
 
 	override function add_sprite(i:Int, p:FlxPoint, g:String)
@@ -22,7 +23,7 @@ class Selection extends ThreeDeeObject
 			s.animation.add('play', [3, 4, 5, 6, 7], 30);
 			s.animation.play('play');
 			s.scale.set(0.75, 0.75);
-			FlxTween.tween(s.scale, { x: 1.25, y: 1.25 }, 1, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+			FlxTween.tween(s.scale, { x: 1.25, y: 1.25 }, 1, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 		}
 		if (i == 1) base = s;
 		FlxG.log.add(s.width);

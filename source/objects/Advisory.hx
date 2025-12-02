@@ -1,4 +1,5 @@
 package objects;
+import flixel.tweens.FlxTween.FlxTweenType;
 
 import states.PlayState;
 
@@ -30,17 +31,17 @@ class Advisory extends FlxGroup
 		add(request);
 
 		man.angle = -5;
-		FlxTween.tween(man.scale, { x: 1.2, y: 1.2 }, 0.5, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
-		FlxTween.tween(man, { angle: 5 }, 0.75, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(man.scale, { x: 1.2, y: 1.2 }, 0.5, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
+		FlxTween.tween(man, { angle: 5 }, 0.75, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 
 		bubble.angle = -5;
-		FlxTween.tween(bubble.scale, { x: 0.8, y: 0.8 }, 0.75, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
-		FlxTween.tween(bubble, { angle: 5 }, 2, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(bubble.scale, { x: 0.8, y: 0.8 }, 0.75, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
+		FlxTween.tween(bubble, { angle: 5 }, 2, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 
 		request.angle = -4;
 		request.scale.set(0.75, 0.75);
-		FlxTween.tween(request.scale, { x: 0.6, y: 0.6 }, 0.75, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
-		FlxTween.tween(request, { angle: 4 }, 2, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(request.scale, { x: 0.6, y: 0.6 }, 0.75, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
+		FlxTween.tween(request, { angle: 4 }, 2, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 
 		for (o in this) o.cameras = [PlayState.ui_cam];
 	}

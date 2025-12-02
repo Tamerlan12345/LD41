@@ -1,4 +1,5 @@
 package states;
+import flixel.tweens.FlxTween.FlxTweenType;
 
 import states.PlayState;
 
@@ -93,7 +94,7 @@ class Title extends ZState
 				FlxG.sound.play('assets/audio/pop.ogg');
 				FlxTween.tween(s.scale, { x: 4, y: 4 }, 0.3, { ease: FlxEase.bounceOut }).onComplete = function(t:FlxTween){
 					if (left) return;
-					FlxTween.tween(s.scale, { x: 3, y: 3 }, 0.5.get_random(0.25), { ease:FlxEase.bounceOut, type:FlxTween.PINGPONG });
+					FlxTween.tween(s.scale, { x: 3, y: 3 }, 0.5.get_random(0.25), { ease:FlxEase.bounceOut, type:FlxTweenType.PINGPONG });
 				}
 			});
 			s.cameras = [cam];

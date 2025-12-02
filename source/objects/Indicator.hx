@@ -1,4 +1,5 @@
 package objects;
+import flixel.tweens.FlxTween.FlxTweenType;
 
 import states.PlayState;
 
@@ -23,8 +24,8 @@ class Indicator extends FlxGroup
 
 	function tween()
 	{
-		FlxTween.tween(arrow.scale, { x: 0.75, y: 0.75 }, 1, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
-		FlxTween.tween(shadow.scale, { x: 0.8, y: 0.8 }, 1, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(arrow.scale, { x: 0.75, y: 0.75 }, 1, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
+		FlxTween.tween(shadow.scale, { x: 0.8, y: 0.8 }, 1, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 	}
 
 	function make_arrow()
