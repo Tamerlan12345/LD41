@@ -15,7 +15,7 @@ class Car extends ThreeDeeObject
 
 	public function new(x, y)
 	{
-		super(FlxPoint.get(x, y), AssetsImg.car__png, 9, true, true);
+		super(FlxPoint.get(x, y), "assets/images/beybit.png", 9, true, true);
 		c = new ZPlayerController(0);
 		c.add();
 		base.angle = -90;

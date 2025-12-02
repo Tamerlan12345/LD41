@@ -1,0 +1,5 @@
+export
+.git
+.vscode
+*.swp
+*.DS_Store
