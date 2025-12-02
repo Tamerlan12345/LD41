@@ -2,6 +2,8 @@ package states;
 
 import objects.*;
 import objects.ThreeDeeObject.Slice;
+import flixel.tweens.FlxTween.FlxTweenType;
+import zero.flxutil.input.ZPlayerController;
 
 class PlayState extends ZState
 {
@@ -151,7 +153,7 @@ class PlayState extends ZState
 		{
 			var s = new FlxSprite(4 + 18 * i, 8);
 			s.loadGraphic(AssetsImg.lives__png, true, 24, 16);
-			FlxTween.tween(s.scale, { x: 1.2, y: 1.2 }, 2.get_random(1), { ease: FlxEase.bounceOut, type: FlxTween.PINGPONG });
+			FlxTween.tween(s.scale, { x: 1.2, y: 1.2 }, 2.get_random(1), { ease: FlxEase.bounceOut, type: FlxTweenType.PINGPONG });
 			add_ui_element(s);
 			lives_spr.push(s);
 		}
@@ -161,7 +163,7 @@ class PlayState extends ZState
 	{
 		var minimap = new FlxSprite(20, FlxG.height - 48, AssetsImg.minimap__png);
 		minimap.scale.set(1.45, 1.45);
-		FlxTween.tween(minimap.scale, { x: 1.55, y: 1.55 }, 2, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(minimap.scale, { x: 1.55, y: 1.55 }, 2, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 
 		var minimap_shadow = new FlxSprite(20, FlxG.height - 44, AssetsImg.minimap__png);
 		minimap_shadow.scale.set(1.4, 1.4);
@@ -243,7 +245,7 @@ class PlayState extends ZState
 		text.scale.set();
 		text.angle = 0.get_random(-15, 15);
 		FlxTween.tween(text.scale, { x: 2, y: 2 }, 0.5, { ease: FlxEase.elasticOut });
-		FlxTween.tween(text, { angle: -text.angle.get_random() }, 3.get_random(2), { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(text, { angle: -text.angle.get_random() }, 3.get_random(2), { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 	}
 
 	function make_winning_text(i:Int)

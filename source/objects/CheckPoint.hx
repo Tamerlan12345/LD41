@@ -1,4 +1,5 @@
 package objects;
+import flixel.tweens.FlxTween.FlxTweenType;
 
 import states.PlayState;
 
@@ -9,7 +10,7 @@ class CheckPoint extends ThreeDeeObject
 	{
 		super(FlxPoint.get(x, y), AssetsImg.checkpoint__png, 6, false, false, false);
 		offset = 3;
-		FlxTween.tween(this, { offset: 8 }, 1, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(this, { offset: 8 }, 1, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 	}
 
 }

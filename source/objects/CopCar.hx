@@ -1,6 +1,6 @@
 package objects;
 
-import flixel.util.FlxPath;
+import flixel.path.FlxPath;
 import states.PlayState;
 import objects.ThreeDeeObject.Slice;
 

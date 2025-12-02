@@ -1,4 +1,5 @@
 package objects;
+import flixel.tweens.FlxTween.FlxTweenType;
 
 import states.PlayState;
 
@@ -17,8 +18,8 @@ class Siren extends Indicator
 	{
 		arrow.scale.set(0.8, 0.8);
 		shadow.scale.set(0.8, 0.8);
-		FlxTween.tween(arrow.scale, { x: 0.5, y: 0.5 }, 1, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
-		FlxTween.tween(shadow.scale, { x: 0.6, y: 0.6 }, 1, { ease: FlxEase.sineInOut, type: FlxTween.PINGPONG });
+		FlxTween.tween(arrow.scale, { x: 0.5, y: 0.5 }, 1, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
+		FlxTween.tween(shadow.scale, { x: 0.6, y: 0.6 }, 1, { ease: FlxEase.sineInOut, type: FlxTweenType.PINGPONG });
 	}
 
 	override function make_arrow()
