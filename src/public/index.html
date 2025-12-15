@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix "Deadline Shifter"</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="login-screen">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" value="admin">
+        <input type="password" id="password" placeholder="Password" value="password">
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+    </div>
+
+    <div id="app-screen" style="display: none;">
+        <header>
+            <h1>Eisenhower Matrix</h1>
+            <button onclick="logout()">Logout</button>
+        </header>
+
+        <div class="controls">
+            <input type="text" id="new-task-title" placeholder="Task description">
+            <input type="date" id="new-task-deadline">
+            <div class="quadrant-selector">
+                <button class="q-btn q1" onclick="addTask(1)">🔥 Do It (Q1)</button>
+                <button class="q-btn q2" onclick="addTask(2)">📅 Plan It (Q2)</button>
+                <button class="q-btn q3" onclick="addTask(3)">📞 Delegate (Q3)</button>
+                <button class="q-btn q4" onclick="addTask(4)">🗑️ Delete (Q4)</button>
+            </div>
+        </div>
+
+        <div class="matrix-grid">
+            <div class="quadrant q1">
+                <div class="header">
+                    <h3>DO</h3>
+                    <span>🔥 Important & Urgent</span>
+                </div>
+                <div class="task-list" id="list-q1"></div>
+            </div>
+            <div class="quadrant q2">
+                <div class="header">
+                    <h3>PLAN</h3>
+                    <span>📅 Important & Not Urgent</span>
+                </div>
+                <div class="task-list" id="list-q2"></div>
+            </div>
+            <div class="quadrant q3">
+                <div class="header">
+                    <h3>DELEGATE</h3>
+                    <span>📞 Not Important & Urgent</span>
+                </div>
+                <div class="task-list" id="list-q3"></div>
+            </div>
+            <div class="quadrant q4">
+                <div class="header">
+                    <h3>DELETE</h3>
+                    <span>🗑️ Not Important & Not Urgent</span>
+                </div>
+                <div class="task-list" id="list-q4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

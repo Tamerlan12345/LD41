@@ -1,0 +1,109 @@
+:root {
+    --q1-color: #ffcccc;
+    --q1-border: #ff0000;
+    --q2-color: #ccffcc;
+    --q2-border: #008000;
+    --q3-color: #ffebcc;
+    --q3-border: #ffa500;
+    --q4-color: #eeeeee;
+    --q4-border: #808080;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9;
+}
+
+#login-screen, #app-screen {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.controls {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.quadrant-selector {
+    display: flex;
+    gap: 5px;
+}
+
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+}
+
+.q-btn.q1 { background-color: var(--q1-border); }
+.q-btn.q2 { background-color: var(--q2-border); }
+.q-btn.q3 { background-color: var(--q3-border); }
+.q-btn.q4 { background-color: var(--q4-border); }
+
+.matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+    height: 80vh;
+}
+
+.quadrant {
+    background: white;
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.quadrant.q1 { border-color: var(--q1-border); background-color: var(--q1-color); }
+.quadrant.q2 { border-color: var(--q2-border); background-color: var(--q2-color); }
+.quadrant.q3 { border-color: var(--q3-border); background-color: var(--q3-color); }
+.quadrant.q4 { border-color: var(--q4-border); background-color: var(--q4-color); }
+
+.header {
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.task-card {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.task-meta {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.deadline-warning {
+    color: #d32f2f;
+    font-weight: bold;
+}
