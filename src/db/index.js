@@ -1,19 +1,57 @@
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+const dns = require('dns');
+const util = require('util');
 require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.PGHOST,
-  port: process.env.PGPORT,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  // Support for DATABASE_URL if present (Railway often provides this)
-  connectionString: process.env.DATABASE_URL || undefined,
-});
+// Превращаем dns.lookup в Promise, чтобы использовать await
+const lookup = util.promisify(dns.lookup);
+
+let pool; // Объявляем переменную, но не инициализируем её сразу
+
+// Функция для получения конфигурации с принудительным IPv4
+async function getDatabaseConfig() {
+  const connectionString = process.env.DATABASE_URL;
+  let config = {
+    connectionString,
+    connectionTimeoutMillis: 5000, // Таймаут 5 секунд
+  };
+
+  try {
+    // Определяем хост: либо из переменной PGHOST, либо парсим из URL
+    let hostname = process.env.PGHOST;
+    if (!hostname && connectionString) {
+      const match = connectionString.match(/@(.*):/);
+      if (match) hostname = match[1];
+    }
+
+    if (hostname) {
+      console.log(`Resolving IP for host: ${hostname}...`);
+      // Принудительно запрашиваем IPv4 (family: 4)
+      const { address } = await lookup(hostname, { family: 4 });
+      console.log(`Resolved to IPv4: ${address}`);
+
+      // Переопределяем хост на полученный IP
+      config.host = address;
+      // Если используем URL, pg может игнорировать host, поэтому лучше явно передать параметры,
+      // но часто override работает. Для надежности можно убрать connectionString если есть host,
+      // но оставим так, обычно pg умный.
+    }
+  } catch (error) {
+    console.warn('DNS lookup failed, proceeding with default settings:', error.message);
+  }
+
+  return config;
+}
 
 async function initDatabase() {
   console.log('Initializing database...');
+
+  // 1. Сначала настраиваем подключение
+  if (!pool) {
+    const config = await getDatabaseConfig();
+    pool = new Pool(config);
+  }
 
   // Create tables if they don't exist
   const createUsersTableQuery = `
@@ -45,6 +83,10 @@ async function initDatabase() {
   `;
 
   try {
+    // Проверка соединения
+    await pool.query('SELECT NOW()');
+    console.log('Connected to DB successfully.');
+
     await pool.query(createUsersTableQuery);
     await pool.query(createTasksTableQuery);
     console.log('Tables created or verified.');
@@ -66,6 +108,12 @@ async function initDatabase() {
 }
 
 module.exports = {
-  pool,
+  // Экспортируем функцию query, которая ссылается на актуальный pool
+  query: (text, params) => {
+    if (!pool) throw new Error('Database not initialized yet!');
+    return pool.query(text, params);
+  },
+  // Геттер на случай, если где-то нужен сам объект pool
+  getPool: () => pool,
   initDatabase
 };

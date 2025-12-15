@@ -1,4 +1,4 @@
-const { pool } = require('../db');
+const { query: dbQuery } = require('../db');
 
 async function runPriorityShift() {
   console.log('Priority CIC: Running scan...');
@@ -15,7 +15,7 @@ async function runPriorityShift() {
       RETURNING id, title;
     `;
 
-    const result = await pool.query(query);
+    const result = await dbQuery(query);
 
     if (result.rowCount > 0) {
       console.log(`Priority CIC: Перемещено ${result.rowCount} задач в статус СРОЧНО.`);

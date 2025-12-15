@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bcrypt = require('bcrypt');
-const { pool, initDatabase } = require('./db');
+const { query, initDatabase } = require('./db');
 const { startPriorityService } = require('./services/priorityCic');
 
 require('dotenv').config();
@@ -29,7 +29,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await pool.query(
+    const result = await query(
       'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username, created_at',
       [username, hashedPassword]
     );
@@ -47,7 +47,7 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
     try {
-        const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        const result = await query('SELECT * FROM users WHERE username = $1', [username]);
         if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
         const user = result.rows[0];
@@ -83,7 +83,7 @@ app.post('/api/tasks', async (req, res) => {
   else if (quadrant === 4) { is_important = false; is_urgent = false; }
 
   try {
-    const result = await pool.query(
+    const result = await query(
       'INSERT INTO tasks (user_id, title, deadline, is_important, is_urgent) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [user_id, title, deadline, is_important, is_urgent]
     );
@@ -100,7 +100,7 @@ app.get('/api/tasks', async (req, res) => {
     if (!user_id) return res.status(400).json({ error: 'User ID required' });
 
     try {
-        const result = await pool.query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY deadline ASC', [user_id]);
+        const result = await query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY deadline ASC', [user_id]);
         res.json(result.rows);
     } catch (error) {
         console.error('Get tasks error:', error);
