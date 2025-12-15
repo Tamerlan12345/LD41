@@ -1,13 +1,16 @@
 const express = require('express');
 const path = require('path');
 const bcrypt = require('bcrypt');
+// ИЗМЕНЕНИЕ 1: Импортируем query вместо pool, так как pool теперь внутри замыкания в db/index.js
 const { query, initDatabase } = require('./db');
 const { startPriorityService } = require('./services/priorityCic');
 
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.APP_PORT || 3000;
+
+// ИЗМЕНЕНИЕ 2: Обязательно слушаем process.env.PORT, который выдает Railway
+const PORT = process.env.PORT || process.env.APP_PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -29,6 +32,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+    // ИЗМЕНЕНИЕ 3: Используем функцию query напрямую
     const result = await query(
       'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username, created_at',
       [username, hashedPassword]
@@ -47,6 +51,7 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
     try {
+        // ИЗМЕНЕНИЕ 3: Используем query
         const result = await query('SELECT * FROM users WHERE username = $1', [username]);
         if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
@@ -56,6 +61,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         res.json({ id: user.id, username: user.username });
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ error: 'Error logging in' });
     }
 });
@@ -72,10 +78,6 @@ app.post('/api/tasks', async (req, res) => {
   let is_urgent = false;
 
   // Mapping Logic
-  // 1: Important & Urgent
-  // 2: Important & Not Urgent
-  // 3: Not Important & Urgent
-  // 4: Not Important & Not Urgent
   const quadrant = parseInt(selected_quadrant);
   if (quadrant === 1) { is_important = true; is_urgent = true; }
   else if (quadrant === 2) { is_important = true; is_urgent = false; }
@@ -83,6 +85,7 @@ app.post('/api/tasks', async (req, res) => {
   else if (quadrant === 4) { is_important = false; is_urgent = false; }
 
   try {
+    // ИЗМЕНЕНИЕ 3: Используем query
     const result = await query(
       'INSERT INTO tasks (user_id, title, deadline, is_important, is_urgent) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [user_id, title, deadline, is_important, is_urgent]
@@ -100,6 +103,7 @@ app.get('/api/tasks', async (req, res) => {
     if (!user_id) return res.status(400).json({ error: 'User ID required' });
 
     try {
+        // ИЗМЕНЕНИЕ 3: Используем query
         const result = await query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY deadline ASC', [user_id]);
         res.json(result.rows);
     } catch (error) {
@@ -108,7 +112,7 @@ app.get('/api/tasks', async (req, res) => {
     }
 });
 
-
+// Запуск сервера с привязкой ко всем интерфейсам (0.0.0.0 подразумевается Express по умолчанию)
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   onServerStart();
