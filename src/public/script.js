@@ -1,40 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Елементы DOM
+    // --- Элементы ---
     const loginForm = document.getElementById('login-form');
     const authScreen = document.getElementById('auth-screen');
     const dashboardScreen = document.getElementById('dashboard-screen');
     const userDisplay = document.getElementById('user-display');
     const logoutBtn = document.getElementById('logout-btn');
+
+    // Элементы добавления
     const addTaskBtn = document.getElementById('add-task-btn');
     const taskTitleInput = document.getElementById('task-title');
     const taskDeadlineInput = document.getElementById('task-deadline');
-    const taskQuadrantSelect = document.getElementById('task-quadrant');
+    const chkUrgent = document.getElementById('chk-urgent');
+    const chkImportant = document.getElementById('chk-important');
 
-    // Состояние
     let currentUser = null;
 
-    // --- СИСТЕМА УВЕДОМЛЕНИЙ (Toast) ---
-    function showToast(message, type = 'success') {
+    // --- Toast уведомления ---
+    function showToast(message) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-
-        let icon = type === 'success' ? '✅' : '❌';
-        toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-
+        toast.className = 'toast';
+        toast.textContent = message;
         container.appendChild(toast);
-
-        // Удалить через 3 секунды
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            toast.style.transition = 'all 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        setTimeout(() => toast.remove(), 3000);
     }
 
-    // --- АВТОРИЗАЦИЯ ---
-    // Проверка сохраненной сессии
+    // --- Авторизация ---
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -45,12 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const btn = document.getElementById('login-btn');
-
-        // UX: Состояние загрузки
-        const originalBtnText = btn.innerText;
-        btn.innerText = 'Вход...';
-        btn.disabled = true;
 
         try {
             const res = await fetch('/api/auth/login', {
@@ -59,29 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
-
             if (res.ok) {
                 currentUser = data;
                 localStorage.setItem('user', JSON.stringify(currentUser));
-                showToast(`Добро пожаловать, ${currentUser.username}!`);
                 showDashboard();
             } else {
-                showToast(data.error || 'Ошибка входа', 'error');
+                showToast(data.error);
             }
-        } catch (err) {
-            showToast('Ошибка сети. Попробуйте позже.', 'error');
-        } finally {
-            btn.innerText = originalBtnText;
-            btn.disabled = false;
-        }
+        } catch (err) { showToast('Ошибка соединения'); }
     });
 
     logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('user');
-        currentUser = null;
-        authScreen.style.display = 'flex';
-        dashboardScreen.classList.add('hidden');
-        showToast('Вы вышли из системы');
+        location.reload();
     });
 
     function showDashboard() {
@@ -91,20 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTasks();
     }
 
-    // --- ЗАДАЧИ ---
+    // --- Логика Задач ---
     addTaskBtn.addEventListener('click', async () => {
         const title = taskTitleInput.value;
         const deadline = taskDeadlineInput.value;
-        const quadrant = taskQuadrantSelect.value;
+        const isUrgent = chkUrgent.checked;
+        const isImportant = chkImportant.checked;
 
-        if (!title || !deadline || !quadrant) {
-            showToast('Пожалуйста, заполните все поля', 'error');
+        if (!title || !deadline) {
+            showToast('Введите название и дату');
             return;
         }
-
-        const btn = addTaskBtn;
-        btn.innerText = 'Сохранение...';
-        btn.disabled = true;
 
         try {
             const res = await fetch('/api/tasks', {
@@ -114,78 +86,82 @@ document.addEventListener('DOMContentLoaded', () => {
                     user_id: currentUser.id,
                     title,
                     deadline,
-                    selected_quadrant: quadrant
+                    is_urgent: isUrgent,
+                    is_important: isImportant
                 })
             });
 
             if (res.ok) {
-                showToast('Задача успешно добавлена!');
-                // UX: Очистка полей
                 taskTitleInput.value = '';
-                taskDeadlineInput.value = '';
-                taskQuadrantSelect.value = '';
+                // Сброс чекбоксов
+                chkUrgent.checked = false;
+                chkImportant.checked = false;
                 loadTasks();
-            } else {
-                showToast('Ошибка при сохранении задачи', 'error');
+                showToast('Задача добавлена');
             }
-        } catch (err) {
-            showToast('Ошибка сети', 'error');
-        } finally {
-            btn.innerText = 'Добавить задачу';
-            btn.disabled = false;
-        }
+        } catch (err) { console.error(err); }
     });
 
     async function loadTasks() {
-        if (!currentUser) return;
+        // Очистка
+        document.querySelectorAll('.task-list').forEach(el => el.innerHTML = '');
 
-        // Очистка списков
-        ['q1', 'q2', 'q3', 'q4'].forEach(id => {
-            document.querySelector(`#${id} .task-list`).innerHTML = '';
+        const res = await fetch(`/api/tasks?user_id=${currentUser.id}`);
+        const tasks = await res.json();
+
+        tasks.forEach(task => {
+            // Определение квадранта на клиенте для распределения
+            let qId = 'q4'; // Default
+            if (task.is_important && task.is_urgent) qId = 'q1';
+            else if (task.is_important && !task.is_urgent) qId = 'q2';
+            else if (!task.is_important && task.is_urgent) qId = 'q3';
+
+            const container = document.querySelector(`#${qId} .task-list`);
+            container.appendChild(createTaskElement(task));
         });
-
-        try {
-            const res = await fetch(`/api/tasks?user_id=${currentUser.id}`);
-            const tasks = await res.json();
-
-            tasks.forEach(task => {
-                const quadrantId = `q${task.quadrant_id}`;
-                const container = document.querySelector(`#${quadrantId} .task-list`);
-
-                if (container) {
-                    const el = createTaskElement(task);
-                    container.appendChild(el);
-                }
-            });
-        } catch (err) {
-            console.error(err);
-            showToast('Не удалось загрузить задачи', 'error');
-        }
     }
 
     function createTaskElement(task) {
         const div = document.createElement('div');
         div.className = 'task-item';
 
-        // Форматирование даты на русский
-        const dateObj = new Date(task.deadline);
-        const dateStr = dateObj.toLocaleString('ru-RU', {
-            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+        const dateStr = new Date(task.deadline).toLocaleString('ru-RU', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
-        // UX: Проверка срочности (если осталось меньше 24 часов)
-        const now = new Date();
-        const diffHours = (dateObj - now) / (1000 * 60 * 60);
-
-        // Добавляем пульсацию, если срочно и задача в 1 или 3 квадранте
-        if (diffHours < 24 && diffHours > -5 && (task.quadrant_id === 1 || task.quadrant_id === 3)) {
-            div.classList.add('urgent-pulse');
-        }
-
         div.innerHTML = `
-            <span class="task-title">${task.title}</span>
-            <span class="task-date">⏰ ${dateStr}</span>
+            <div class="task-top">
+                <span class="task-title">${task.title}</span>
+            </div>
+            <div class="task-date">
+                <span class="material-icons-round" style="font-size:14px">schedule</span> ${dateStr}
+            </div>
+            <div class="task-actions">
+                <button class="icon-btn done" title="Выполнено" onclick="completeTask(${task.id})">
+                    <span class="material-icons-round">check_circle</span>
+                </button>
+                <button class="icon-btn delete" title="Удалить" onclick="deleteTask(${task.id})">
+                    <span class="material-icons-round">delete</span>
+                </button>
+            </div>
         `;
         return div;
     }
+
+    // Глобальные функции для кнопок в HTML string
+    window.deleteTask = async (id) => {
+        if(!confirm('Удалить задачу?')) return;
+        try {
+            await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+            loadTasks();
+        } catch(e) { showToast('Ошибка удаления'); }
+    };
+
+    window.completeTask = async (id) => {
+        try {
+            await fetch(`/api/tasks/${id}/complete`, { method: 'PATCH' });
+            showToast('Задача выполнена!');
+            loadTasks();
+        } catch(e) { showToast('Ошибка'); }
+    };
 });

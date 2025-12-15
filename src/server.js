@@ -7,43 +7,17 @@ const { startPriorityService } = require('./services/priorityCic');
 require('dotenv').config();
 
 const app = express();
-// Порт берется из окружения Railway или 3000
 const PORT = process.env.PORT || process.env.APP_PORT || 3000;
 
 app.use(express.json());
-// Раздаем статику из папки public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware для старта БД и сервисов
 async function onServerStart() {
   await initDatabase();
   startPriorityService();
 }
 
 // --- API Роуты ---
-
-// Регистрация (Оставим для расширения, но основной вход через Veronika)
-app.post('/api/auth/register', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Требуется имя пользователя и пароль' });
-  }
-
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await query(
-      'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username, created_at',
-      [username, hashedPassword]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Registration error:', error);
-    if (error.code === '23505') {
-        return res.status(409).json({ error: 'Пользователь уже существует' });
-    }
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
-  }
-});
 
 // Логин
 app.post('/api/auth/login', async (req, res) => {
@@ -65,24 +39,15 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Создание задачи
 app.post('/api/tasks', async (req, res) => {
-  const { title, deadline, selected_quadrant, user_id } = req.body;
+  const { title, deadline, is_important, is_urgent, user_id } = req.body;
 
-  if (!title || !deadline || !selected_quadrant || !user_id) {
-    return res.status(400).json({ error: 'Заполните все поля' });
+  if (!title || !deadline || user_id === undefined) {
+    return res.status(400).json({ error: 'Заполните обязательные поля' });
   }
-
-  let is_important = false;
-  let is_urgent = false;
-
-  const quadrant = parseInt(selected_quadrant);
-  if (quadrant === 1) { is_important = true; is_urgent = true; }
-  else if (quadrant === 2) { is_important = true; is_urgent = false; }
-  else if (quadrant === 3) { is_important = false; is_urgent = true; }
-  else if (quadrant === 4) { is_important = false; is_urgent = false; }
 
   try {
     const result = await query(
-      'INSERT INTO tasks (user_id, title, deadline, is_important, is_urgent) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO tasks (user_id, title, deadline, is_important, is_urgent, is_completed) VALUES ($1, $2, $3, $4, $5, FALSE) RETURNING *',
       [user_id, title, deadline, is_important, is_urgent]
     );
     res.status(201).json(result.rows[0]);
@@ -92,17 +57,45 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
-// Получение задач
+// Получение задач (только активные)
 app.get('/api/tasks', async (req, res) => {
     const { user_id } = req.query;
     if (!user_id) return res.status(400).json({ error: 'Требуется ID пользователя' });
 
     try {
-        const result = await query('SELECT * FROM tasks WHERE user_id = $1 ORDER BY deadline ASC', [user_id]);
+        // Возвращаем только не выполненные задачи для матрицы
+        const result = await query(
+            'SELECT * FROM tasks WHERE user_id = $1 AND is_completed = FALSE ORDER BY deadline ASC',
+            [user_id]
+        );
         res.json(result.rows);
     } catch (error) {
         console.error('Get tasks error:', error);
         res.status(500).json({ error: 'Ошибка получения задач' });
+    }
+});
+
+// Удаление задачи
+app.delete('/api/tasks/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await query('DELETE FROM tasks WHERE id = $1', [id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Delete task error:', error);
+        res.status(500).json({ error: 'Ошибка удаления' });
+    }
+});
+
+// Завершение задачи (Архивация)
+app.patch('/api/tasks/:id/complete', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await query('UPDATE tasks SET is_completed = TRUE WHERE id = $1', [id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Complete task error:', error);
+        res.status(500).json({ error: 'Ошибка обновления статуса' });
     }
 });
 

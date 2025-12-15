@@ -58,6 +58,7 @@ async function initDatabase() {
       title TEXT NOT NULL,
       is_important BOOLEAN DEFAULT FALSE,
       is_urgent BOOLEAN DEFAULT FALSE,
+      is_completed BOOLEAN DEFAULT FALSE,
       deadline TIMESTAMP,
       quadrant_id INT GENERATED ALWAYS AS (
         CASE
@@ -78,7 +79,21 @@ async function initDatabase() {
     await pool.query(createTasksTableQuery);
     console.log('Tables created or verified.');
 
-    // --- ИЗМЕНЕНИЯ ЗДЕСЬ: Создаем Veronika ---
+    // --- MIGRATION: Check for is_completed column ---
+    const checkColumnQuery = `
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name='tasks' AND column_name='is_completed';
+    `;
+    const res = await pool.query(checkColumnQuery);
+    if (res.rows.length === 0) {
+        console.log('Adding is_completed column to tasks table...');
+        await pool.query('ALTER TABLE tasks ADD COLUMN is_completed BOOLEAN DEFAULT FALSE');
+        console.log('Column is_completed added.');
+    }
+    // ------------------------------------------------
+
+    // --- Seeding Veronika ---
     const targetUser = 'Veronika';
     const targetPass = '7777777Veronika';
 
