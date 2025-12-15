@@ -1,62 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eisenhower Matrix</title>
+    <title>Матрица Эйзенхауэра</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <div id="toast-container"></div>
+
     <div id="auth-screen">
         <div class="auth-card">
-            <h2>Welcome Back</h2>
+            <h2>Вход в систему</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9em;">
+                Планируй. Действуй. Успевай.
+            </p>
             <form id="login-form">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
+                <input type="text" id="username" placeholder="Имя пользователя" required>
+                <input type="password" id="password" placeholder="Пароль" required>
+                <button type="submit" id="login-btn">Войти</button>
             </form>
-            <p id="auth-error" style="color: #ef4444; margin-top: 10px; font-size: 0.9em;"></p>
         </div>
     </div>
 
     <div id="dashboard-screen" class="hidden">
         <div class="container">
             <header>
-                <h2>Deadline Shifter</h2>
+                <div>
+                    <h2>Матрица Задач</h2>
+                    <p style="font-size: 0.8em; color: var(--text-muted);">Система управления приоритетами</p>
+                </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <span id="user-display" style="color: var(--text-muted);"></span>
-                    <button id="logout-btn" style="background: transparent; border: 1px solid var(--border-color); padding: 8px 16px;">Logout</button>
+                    <span id="user-display" style="color: var(--primary-color); font-weight: 600;"></span>
+                    <button id="logout-btn" class="outline-btn">Выйти</button>
                 </div>
             </header>
 
             <div class="controls">
-                <input type="text" id="task-title" placeholder="New Task Title...">
+                <input type="text" id="task-title" placeholder="Что нужно сделать?">
                 <input type="datetime-local" id="task-deadline">
                 <select id="task-quadrant">
-                    <option value="1">Urgent & Important</option>
-                    <option value="2">Not Urgent & Important</option>
-                    <option value="3">Urgent & Not Important</option>
-                    <option value="4">Not Urgent & Not Important</option>
+                    <option value="" disabled selected>Выберите важность...</option>
+                    <option value="1">🔥 Срочно и Важно (Сделать сейчас)</option>
+                    <option value="2">📅 Важно, не Срочно (В план)</option>
+                    <option value="3">🗣 Срочно, не Важно (Делегировать)</option>
+                    <option value="4">🗑 Не срочно, не Важно (Удалить)</option>
                 </select>
-                <button id="add-task-btn">+ Add Task</button>
+                <button id="add-task-btn">Добавить задачу</button>
             </div>
 
             <div class="matrix-grid">
                 <div class="quadrant" id="q1">
-                    <h3>Do First (Urgent/Imp)</h3>
+                    <h3>Сделать сейчас</h3>
                     <div class="task-list"></div>
                 </div>
                 <div class="quadrant" id="q2">
-                    <h3>Schedule (Not Urgent/Imp)</h3>
+                    <h3>Запланировать</h3>
                     <div class="task-list"></div>
                 </div>
                 <div class="quadrant" id="q3">
-                    <h3>Delegate (Urgent/Not Imp)</h3>
+                    <h3>Делегировать</h3>
                     <div class="task-list"></div>
                 </div>
                 <div class="quadrant" id="q4">
-                    <h3>Delete (Not Urgent/Not Imp)</h3>
+                    <h3>В корзину</h3>
                     <div class="task-list"></div>
                 </div>
             </div>
