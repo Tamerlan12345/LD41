@@ -3,63 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eisenhower Matrix "Deadline Shifter"</title>
+    <title>Eisenhower Matrix</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="login-screen">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username" value="admin">
-        <input type="password" id="password" placeholder="Password" value="password">
-        <button onclick="login()">Login</button>
-        <button onclick="register()">Register</button>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2>Welcome Back</h2>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p id="auth-error" style="color: #ef4444; margin-top: 10px; font-size: 0.9em;"></p>
+        </div>
     </div>
 
-    <div id="app-screen" style="display: none;">
-        <header>
-            <h1>Eisenhower Matrix</h1>
-            <button onclick="logout()">Logout</button>
-        </header>
+    <div id="dashboard-screen" class="hidden">
+        <div class="container">
+            <header>
+                <h2>Deadline Shifter</h2>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span id="user-display" style="color: var(--text-muted);"></span>
+                    <button id="logout-btn" style="background: transparent; border: 1px solid var(--border-color); padding: 8px 16px;">Logout</button>
+                </div>
+            </header>
 
-        <div class="controls">
-            <input type="text" id="new-task-title" placeholder="Task description">
-            <input type="date" id="new-task-deadline">
-            <div class="quadrant-selector">
-                <button class="q-btn q1" onclick="addTask(1)">🔥 Do It (Q1)</button>
-                <button class="q-btn q2" onclick="addTask(2)">📅 Plan It (Q2)</button>
-                <button class="q-btn q3" onclick="addTask(3)">📞 Delegate (Q3)</button>
-                <button class="q-btn q4" onclick="addTask(4)">🗑️ Delete (Q4)</button>
+            <div class="controls">
+                <input type="text" id="task-title" placeholder="New Task Title...">
+                <input type="datetime-local" id="task-deadline">
+                <select id="task-quadrant">
+                    <option value="1">Urgent & Important</option>
+                    <option value="2">Not Urgent & Important</option>
+                    <option value="3">Urgent & Not Important</option>
+                    <option value="4">Not Urgent & Not Important</option>
+                </select>
+                <button id="add-task-btn">+ Add Task</button>
             </div>
-        </div>
 
-        <div class="matrix-grid">
-            <div class="quadrant q1">
-                <div class="header">
-                    <h3>DO</h3>
-                    <span>🔥 Important & Urgent</span>
+            <div class="matrix-grid">
+                <div class="quadrant" id="q1">
+                    <h3>Do First (Urgent/Imp)</h3>
+                    <div class="task-list"></div>
                 </div>
-                <div class="task-list" id="list-q1"></div>
-            </div>
-            <div class="quadrant q2">
-                <div class="header">
-                    <h3>PLAN</h3>
-                    <span>📅 Important & Not Urgent</span>
+                <div class="quadrant" id="q2">
+                    <h3>Schedule (Not Urgent/Imp)</h3>
+                    <div class="task-list"></div>
                 </div>
-                <div class="task-list" id="list-q2"></div>
-            </div>
-            <div class="quadrant q3">
-                <div class="header">
-                    <h3>DELEGATE</h3>
-                    <span>📞 Not Important & Urgent</span>
+                <div class="quadrant" id="q3">
+                    <h3>Delegate (Urgent/Not Imp)</h3>
+                    <div class="task-list"></div>
                 </div>
-                <div class="task-list" id="list-q3"></div>
-            </div>
-            <div class="quadrant q4">
-                <div class="header">
-                    <h3>DELETE</h3>
-                    <span>🗑️ Not Important & Not Urgent</span>
+                <div class="quadrant" id="q4">
+                    <h3>Delete (Not Urgent/Not Imp)</h3>
+                    <div class="task-list"></div>
                 </div>
-                <div class="task-list" id="list-q4"></div>
             </div>
         </div>
     </div>
