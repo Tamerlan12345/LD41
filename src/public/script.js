@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentUser = null;
 
+    // Toggle Button Visuals
+    function updateToggleVisuals() {
+        document.getElementById('toggle-urgent').classList.toggle('active', chkUrgent.checked);
+        document.getElementById('toggle-important').classList.toggle('active', chkImportant.checked);
+    }
+    chkUrgent.addEventListener('change', updateToggleVisuals);
+    chkImportant.addEventListener('change', updateToggleVisuals);
+
     // --- Toast уведомления ---
     function showToast(message) {
         const container = document.getElementById('toast-container');
@@ -96,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Сброс чекбоксов
                 chkUrgent.checked = false;
                 chkImportant.checked = false;
+                updateToggleVisuals(); // Update visuals after reset
                 loadTasks();
                 showToast('Задача добавлена');
             }
@@ -134,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="task-title">${task.title}</span>
             </div>
             <div class="task-date">
-                <span class="material-icons-round" style="font-size:14px">schedule</span> ${dateStr}
+                <span class="material-icons-round">schedule</span> ${dateStr}
             </div>
             <div class="task-actions">
                 <button class="icon-btn done" title="Выполнено" onclick="completeTask(${task.id})">
